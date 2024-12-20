@@ -71,4 +71,4 @@ async def upload_file(files: List[UploadFile] = File(...)):
     loader = PyPDFLoader(audio_path)
     pages=loader.load()
 
-    return JSONResponse(content={"message": pages[2].page_content}, status_code=200)
+    return JSONResponse(content={"message": pages[0].page_content}, status_code=200)
