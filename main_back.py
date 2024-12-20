@@ -3,6 +3,11 @@ from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.responses import JSONResponse 
 import speech_recognition as sr
 from fastapi.middleware.cors import CORSMiddleware
+from langchain.document_loaders import PyPDFLoader
+import logging
+
+logger = logging.getLogger('uvicorn.error')
+logger.setLevel(logging.DEBUG)
 
 app = FastAPI() 
 
@@ -52,3 +57,18 @@ async def upload_audio(files: List[UploadFile] = File(...)):
       file.close()
 
 
+@app.post("/upload-file")
+
+async def upload_file(files: List[UploadFile] = File(...)):
+
+  for file in files:
+    # loader = PyPDFLoader(r"C:\Users\Duglas\Documents\python\drylab.pdf")
+    contents = await file.read()
+    audio_path = f"uploaded_{file.filename}"
+    with open(audio_path, 'wb') as f:
+      f.write(contents)
+
+    loader = PyPDFLoader(audio_path)
+    pages=loader.load()
+
+    return JSONResponse(content={"message": pages[2].page_content}, status_code=200)
